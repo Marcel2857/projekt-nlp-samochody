@@ -1,9 +1,4 @@
-"""
-main_clean.py - Projekt NLP: Przewidywanie cen samochodów
-Autor: [Twoje Imię]
-Data: [Data]
-Opis: System ML do przewidywania cen samochodów na podstawie ich cech
-"""
+
 
 # ========== IMPORTY ==========
 import pandas as pd
