@@ -16,7 +16,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
 
 def main():
-    """Główna funkcja programu"""
+
 
     print("=" * 70)
     print("SYSTEM PRZEWIDYWANIA CEN SAMOCHODÓW")
@@ -33,7 +33,7 @@ def main():
         print("Pobierz z: https://raw.githubusercontent.com/selva86/datasets/master/Cars93.csv")
         return
 
-    # Wczytaj dane
+
     data = pd.read_csv(sciezka)
     print(f"Wczytano: {len(data)} rekordów")
     print(f"Liczba cech: {len(data.columns)}")
@@ -42,7 +42,7 @@ def main():
     print("\n2. ANALIZA DANYCH")
     print("-" * 40)
 
-    # Podstawowe statystyki
+
     if 'Price' in data.columns:
         print("Analiza zmiennej docelowej (Price):")
         print(f"  Średnia: ${data['Price'].mean():.2f}")
@@ -51,7 +51,7 @@ def main():
         print(f"  Max: ${data['Price'].max():.2f}")
         print(f"  Odchylenie standardowe: ${data['Price'].std():.2f}")
 
-    # Sprawdź brakujące dane
+
     missing = data.isnull().sum().sum()
     if missing > 0:
         print(f"\nUwaga: Znaleziono {missing} brakujących wartości")
@@ -60,27 +60,27 @@ def main():
     print("\n3. PRZYGOTOWANIE DANYCH")
     print("-" * 40)
 
-    # Wybierz tylko kolumny numeryczne
+
     numeric_cols = data.select_dtypes(include=[np.number]).columns.tolist()
 
     if 'Price' not in numeric_cols:
         print("Błąd: Brak kolumny 'Price' w danych numerycznych")
         return
 
-    # Utwórz DataFrame z tylko numerycznymi kolumnami
+
     df_numeric = data[numeric_cols].copy()
 
-    # Uzupełnij brakujące wartości
+
     df_numeric = df_numeric.fillna(df_numeric.mean())
 
-    # Przygotuj dane do modelowania
+
     X = df_numeric.drop(columns=['Price'])
     y = df_numeric['Price']
 
     print(f"Liczba cech: {X.shape[1]}")
     print(f"Liczba próbek: {X.shape[0]}")
 
-    # Normalizacja danych
+
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
@@ -101,10 +101,10 @@ def main():
     print("\n5. TRENOWANIE MODELU")
     print("-" * 40)
 
-    # Model Random Forest
+
     print("Model: Random Forest Regressor")
 
-    # Domyślny model
+
     model_default = RandomForestRegressor(
         n_estimators=100,
         max_depth=10,
@@ -150,7 +150,7 @@ def main():
         for param, value in grid_search.best_params_.items():
             print(f"  {param}: {value}")
 
-        # Użyj najlepszego modelu
+
         best_model = grid_search.best_estimator_
         y_pred_best = best_model.predict(X_test)
 
@@ -183,7 +183,7 @@ def main():
     print("-" * 40)
 
     if hasattr(model, 'feature_importances_'):
-        # Pobierz ważność cech
+
         feature_importance = pd.DataFrame({
             'feature': X.columns,
             'importance': model.feature_importances_
@@ -199,16 +199,16 @@ def main():
     print("\n8. WIZUALIZACJA WYNIKÓW")
     print("-" * 40)
 
-    # Utwórz folder na wykresy
+
     os.makedirs('plots', exist_ok=True)
 
-    # Wykres 1: Porównanie rzeczywistych i przewidywanych wartości
+
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)
     plt.scatter(y_test, y_pred, alpha=0.6, edgecolors='k', linewidth=0.5)
 
-    # Linia idealnego dopasowania
+
     min_val = min(y_test.min(), y_pred.min())
     max_val = max(y_test.max(), y_pred.max())
     plt.plot([min_val, max_val], [min_val, max_val], 'r--', linewidth=2)
@@ -218,7 +218,7 @@ def main():
     plt.title('Rzeczywiste vs Przewidziane ceny')
     plt.grid(True, alpha=0.3)
 
-    # Wykres 2: Rozkład błędów
+
     plt.subplot(1, 2, 2)
     errors = y_test - y_pred
     plt.hist(errors, bins=15, edgecolor='black', alpha=0.7)
@@ -239,13 +239,13 @@ def main():
     print("-" * 40)
 
     if len(X_test) > 0:
-        # Wybierz losową próbkę testową
+
         sample_idx = 0
         sample_features = X_test[sample_idx].reshape(1, -1)
         actual_price = y_test.iloc[sample_idx]
         predicted_price = model.predict(sample_features)[0]
 
-        # Znajdź oryginalny rekord
+
         original_record = data.iloc[data.index[y_test.index[sample_idx]]]
 
         print("Przykładowy samochód:")
