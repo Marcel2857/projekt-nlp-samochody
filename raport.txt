@@ -1,0 +1,154 @@
+RAPORT PROJEKTU: SYSTEM PRZEWIDYWANIA CEN SAMOCHODÓW
+
+INFORMACJE OGÓLNE
+ Autor: Marcel Krzysztoń
+ Numer indeksu: 31889
+
+
+1. CEL PROJEKTU
+Stworzenie systemu uczenia maszynowego do przewidywania cen używanych samochodów na podstawie ich cech technicznych, wykorzystującego pełny pipeline data science: od pozyskania danych przez przetwarzanie, modelowanie, po ewaluację.
+
+2. ŹRÓDŁO I CHARAKTERYSTYKA DANYCH
+Dataset: Cars93 (93 samochody z rynku USA z 1993 roku)
+Źródło: https://raw.githubusercontent.com/selva86/datasets/master/Cars93.csv
+Format: CSV 
+Jednostka cen: Tysiące dolarów amerykańskich (np. $19.51 = $19,510)
+
+Wykorzystane kolumny:
+ Cecha docelowa: Price 
+ Cechy kategoryczne: Manufacturer , Type , Origin 
+ Cechy numeryczne: MPG.city (spalanie w mieście), EngineSize (pojemność silnika), Horsepower (moc), RPM (obroty), Fuel.tank.capacity (pojemność baku), Passengers (liczba pasażerów), Length (długość), Wheelbase (rozstaw osi), Width (szerokość)
+
+3. PRZEPROWADZONE OPERACJE I ICH UZASADNIENIE
+
+3.1. Pozyskanie i wczytanie danych
+ Operacja: wczytanie pliku CSV przy użyciu biblioteki pandas
+ Implementacja: pd.read_csv('data/cars93_real.csv', encoding='utf-8')
+ Wynik: pomyślnie wczytano 93 rekordy z 27 kolumnami
+
+3.2. Analiza eksploracyjna danych (EDA)
+ Operacja: obliczenie podstawowych statystyk opisowych
+ Wykonane analizy:
+  - statystyki opisowe dla zmiennej docelowej (Price)
+  - liczba brakujących wartości
+  - analiza producentów i typów samochodów
+ Wyniki:
+  - średnia cena: $19.51 tys. ($19,510)
+  - zakres cen: $7.40 - $61.90 tys.
+  - odchylenie standardowe: $9.66 tys.
+  - brak brakujących wartości w wybranych kolumnach
+
+3.3. Przygotowanie danych
+3.3.1. Selekcja cech
+ Operacja: wybór tylko kolumn numerycznych
+ Implementacja: data.select_dtypes(include=[np.number])
+
+3.3.2. Normalizacja danych
+ Operacja: standaryzacja cech numerycznych przy użyciu StandardScaler
+ Implementacja: standardScaler().fit_transform(X)
+ Efekt: wzystkie cechy mają średnią 0 i odchylenie standardowe 1
+
+3.3.3. Podział danych
+ Operacja: pdział na zbiór treningowy (75%) i testowy (25%)
+ Parametry: test_size=0.25, random_state=42 (dla powtarzalności)
+ Wynik: 69 próbek treningowych, 24 próbki testowe
+
+3.4. Modelowanie
+3.4.1. Wybór algorytmu
+ Algorytm: rndom Forest Regressor
+ Parametry początkowe: n_estimators=100, max_depth=10, random_state=42
+
+3.4.2. Trenowanie modelu
+ Operacja: dpasowanie modelu do danych treningowych
+ Implementacja: model.fit(X_train, y_train)
+
+3.5. Fine-tuning parametrów
+ Metoda: GridSearchCV z 5-krotną walidacją krzyżową
+ Testowane parametry:
+  - n_estimators: [50, 100, 150] (liczba drzew w lesie)
+  - max_depth: [5, 10, 15, None] (maksymalna głębokość drzew)
+  - min_samples_split: [2, 5, 10] (minimalna liczba próbek do podziału węzła)
+ Wynik: znalezienie najlepszej kombinacji parametrów
+
+3.6. Ewaluacja modelu
+3.6.1. Metryki ewaluacji
+ MAE (Mean Absolute Error): średni błąd bezwzględny w jednostkach docelowych
+ R² (R-squared): współczynnik determinacji określający, jaka część wariancji jest wyjaśniona przez model
+
+3.6.2. Analiza ważności cech
+ Operacja: określenie, które cechy mają największy wpływ na przewidywania
+ Implementacja: model.feature_importances_
+
+4. WYNIKI I ANALIZA
+
+4.1. Wyniki modelu
+Model: Random Forest Regressor
+
+Wyniki przed dostrojeniem:
+- MAE: $3.21 tys. ($3,210)
+- R²: 0.812
+
+Wyniki po dostrojeniu (GridSearchCV):
+- MAE: $2.98 tys. ($2,980)
+- R²: 0.834
+- Poprawa: 7.2% względem modelu domyślnego
+
+Najlepsze parametry znalezione:
+- n_estimators: 150
+- max_depth: 10
+- min_samples_split: 2
+
+4.2. Interpretacja metryk
+- MAE = $2.98 tys.: Model średnio myli się o ±$2,980
+- R² = 0.834: Model wyjaśnia 83.4% wariancji cen
+- Błąd względny: 15.3% średniej ceny ($2,980 / $19,510)
+
+4.3. Analiza ważności cech
+Najważniejsze cechy wpływające na cenę (w kolejności):
+1. Horsepower (32.4%): moc silnika - najsilniejszy predyktor ceny
+2. EngineSize (21.8%): pojemność silnika
+3. MPG.city (15.7%): spalanie w mieście (ekonomiczność)
+4. RPM (12.3%): maksymalne obroty silnika
+5. Length (8.9%): długość pojazdu
+
+4.4. Wizualizacje (wygenerowane do folderu plots/)
+- Porównanie rzeczywistych i przewidywanych cen: większość punktów blisko linii y=x
+- Rozkład błędów: rozkład zbliżony do normalnego ze średnią bliską 0
+
+5. WNIOSKI
+
+5.1. Jakość modelu
+ Dobra dokładność (R² = 0.834), model dobrze uchwycił zależności w danych
+ Błąd MAE na poziomie 15.3% 
+ Fine-tuning poprawił wydajność modelu o 7.2%
+
+5.2. Praktyczne zastosowanie
+System może służyć jako:
+ Narzędzie wspomagające decyzje zakupowe (estymacja wartości samochodu)
+ Benchmark dla dealerów samochodowych
+ Wykrywacz anomalii cenowych (podejrzanie niskie/wysokie ceny)
+
+5.3. Ograniczenia
+1. Ilość danych: tylko 93 rekordy - mało dla głębokich modeli
+2. Kontekst czasowy: dane z 1993 roku, ceny nie odzwierciedlają obecnego rynku
+3. Ograniczony zestaw cech: brak informacji o kolorze, stanie technicznym, wyposażeniu
+4. Rynek: tylko samochody z rynku USA
+
+5.4. Możliwe ulepszenia
+1. Zwiększenie zbioru danych (pozyskanie >1000 rekordów)
+2. Dodanie cech jakościowych (kolor, stan wnętrza, historia serwisowa)
+4. Uwzględnienie inflacji i czynników ekonomicznych
+5. Rozszerzenie o dane z różnych rynków i okresów
+
+6. INSTALACJA I URUCHOMIENIE
+
+6.1. Wymagania systemowe
+- Python 3.8 lub nowszy
+- System operacyjny: Windows/Linux/MacOS
+
+6.2. Pobieranie repo
+- Link do repo: https://github.com/Marcel2857/projekt-nlp-samochody.git
+
+6.3. Uruchomienie programu
+
+python main_clean_fixed.py
