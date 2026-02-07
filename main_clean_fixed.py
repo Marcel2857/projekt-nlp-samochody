@@ -1,11 +1,8 @@
 """
 main_clean.py - Projekt NLP: Przewidywanie cen samochodów
-Autor: [Twoje Imię]
-Data: [Data]
-Opis: System ML do przewidywania cen samochodów na podstawie ich cech
 """
 
-# ========== IMPORTY ==========
+
 import pandas as pd
 import numpy as np
 import os
@@ -22,7 +19,7 @@ def main():
     print("SYSTEM PRZEWIDYWANIA CEN SAMOCHODÓW")
     print("=" * 70)
 
-    # ========== 1. WCZYTANIE DANYCH ==========
+
     print("\n1. WCZYTANIE DANYCH")
     print("-" * 40)
 
@@ -38,7 +35,7 @@ def main():
     print(f"Wczytano: {len(data)} rekordów")
     print(f"Liczba cech: {len(data.columns)}")
 
-    # ========== 2. ANALIZA DANYCH ==========
+
     print("\n2. ANALIZA DANYCH")
     print("-" * 40)
 
@@ -56,7 +53,7 @@ def main():
     if missing > 0:
         print(f"\nUwaga: Znaleziono {missing} brakujących wartości")
 
-    # ========== 3. PRZYGOTOWANIE DANYCH ==========
+
     print("\n3. PRZYGOTOWANIE DANYCH")
     print("-" * 40)
 
@@ -86,7 +83,7 @@ def main():
 
     print("Dane znormalizowane (StandardScaler)")
 
-    # ========== 4. PODZIAŁ DANYCH ==========
+
     print("\n4. PODZIAŁ DANYCH")
     print("-" * 40)
 
@@ -97,7 +94,7 @@ def main():
     print(f"Zbiór treningowy: {X_train.shape[0]} próbek")
     print(f"Zbiór testowy: {X_test.shape[0]} próbek")
 
-    # ========== 5. TRENOWANIE MODELU ==========
+
     print("\n5. TRENOWANIE MODELU")
     print("-" * 40)
 
@@ -121,12 +118,11 @@ def main():
     print(f"  MAE: ${mae_default:.2f}")
     print(f"  R²: {r2_default:.3f}")
 
-    # ========== 6. FINE-TUNING ==========
+
     print("\n6. DOSTRAJANIE PARAMETRÓW (FINE-TUNING)")
     print("-" * 40)
 
     try:
-        # Definiuj przestrzeń parametrów
         param_grid = {
             'n_estimators': [50, 100, 150],
             'max_depth': [5, 10, 15, None],
@@ -178,7 +174,7 @@ def main():
         mae_final = mae_default
         r2_final = r2_default
 
-    # ========== 7. ANALIZA WAŻNOŚCI CECH ==========
+
     print("\n7. ANALIZA WAŻNOŚCI CECH")
     print("-" * 40)
 
@@ -195,7 +191,6 @@ def main():
     else:
         print("Model nie dostarcza informacji o ważności cech")
 
-    # ========== 8. WIZUALIZACJA ==========
     print("\n8. WIZUALIZACJA WYNIKÓW")
     print("-" * 40)
 
@@ -234,7 +229,6 @@ def main():
 
     print("Zapisano wykres: plots/results_visualization.png")
 
-    # ========== 9. PRZYKŁAD PRZEWIDYWANIA ==========
     print("\n9. PRZYKŁAD PRZEWIDYWANIA")
     print("-" * 40)
 
@@ -261,7 +255,6 @@ def main():
         error_percent = abs(actual_price - predicted_price) / actual_price * 100
         print(f"Błąd względny: {error_percent:.1f}%")
 
-    # ========== 10. PODSUMOWANIE ==========
     print("\n" + "=" * 70)
     print("PODSUMOWANIE")
     print("=" * 70)
